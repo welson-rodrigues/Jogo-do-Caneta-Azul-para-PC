@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html>
+
+<!--CRIADO EM VÍDEO PELO ZEE GAMEDEV E O CHATGPT KKKKKKKKKKKKKK-->
+
+<head>
+    <meta charset="UTF-8">
+    <title>Caneta Azul VS Lula Analfabeto</title>
+    <style>
+        canvas {
+            border: 1px solid black;
+            display: block;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+
+<body>
+
+    <audio id="plai" src="musica_caneta_azul.mp3"></audio>
+    <button id="playPauseButton" onclick="togglePlayPause()">Reproduzir</button>
+    <canvas id="gameCanvas" width="800" height="600"></canvas>
+    <script>
+        const canvas = document.getElementById("gameCanvas");
+        const ctx = canvas.getContext("2d");
+
+        const destroySound = new Audio("destroy.mp3"); // Coloque o caminho correto para o arquivo de som
+        const impactSound = new Audio("impact.mp3"); // Coloque o caminho correto para o arquivo de som de impacto
+        const backgroundColor = "black"; // You can change this to any color you want
+        const canvasColor = "blue";     // You can change this to any color you want
+
+        const plai = document.getElementById('plai');
+        const playPauseButton = document.getElementById('playPauseButton');
+
+        const player = {
+            x: canvas.width / 2,
+            y: canvas.height - 50,
+            width: 50,
+            height: 50,
+            speed: 50,
+            isDestroyed: false
+        };
+
+        const bullets = [];
+        const enemies = [];
+
+        function drawPlayer() {
+            if (player.isDestroyed) return;
+
+            const playerImage = new Image();
+            playerImage.src = "gomes.jpg"; // Coloque o caminho correto para a imagem da nave
+            ctx.drawImage(playerImage, player.x, player.y, player.width, player.height);
+        }
+
+        plai.addEventListener('ended', function () {
+            plai.currentTime = 0; // Volta para o início da música
+            plai.play(); // Reproduz a música novamente
+        });
+
+
+        function togglePlayPause() {
+            if (plai.paused) {
+                plai.play();
+                playPauseButton.textContent = 'Pausar';
+            } else {
+                plai.pause();
+                playPauseButton.textContent = 'Reproduzir';
+            }
+        }
+
+        function drawBullets() {
+            ctx.fillStyle = canvasColor;
+            bullets.forEach((bullet) => {
+                ctx.fillRect(bullet.x, bullet.y, bullet.width, bullet.height);
+            });
+        }
+
+        function drawEnemies() {
+            enemies.forEach((enemy) => {
+                if (!enemy.isDestroyed) {
+                    const enemyImage = new Image();
+                    enemyImage.src = "lula.jpg"; // Coloque o caminho correto para a imagem dos obstáculos
+                    ctx.drawImage(enemyImage, enemy.x, enemy.y, enemy.width, enemy.height);
+                }
+            });
+        }
+
+        function movePlayer(event) {
+            if (player.isDestroyed) return;
+
+            if (event.key === "ArrowLeft" && player.x > 0) {
+                player.x -= player.speed;
+            } else if (event.key === "ArrowRight" && player.x < canvas.width - player.width) {
+                player.x += player.speed;
+            } else if (event.key === " ") {
+                bullets.push({
+                    x: player.x + player.width / 2 - 2,
+                    y: player.y - 5,
+                    width: 4,
+                    height: 10,
+                    speed: 10
+                });
+            }
+        }
+
+        function updateBullets() {
+            bullets.forEach((bullet, index) => {
+                bullet.y -= bullet.speed;
+                if (bullet.y < 0) {
+                    bullets.splice(index, 1);
+                }
+            });
+        }
+
+        function updateEnemies() {
+            enemies.forEach((enemy, index) => {
+                enemy.y += 3;
+                if (enemy.y > canvas.height) {
+                    enemies.splice(index, 1);
+                }
+
+                // Check collision with player
+                if (
+                    !player.isDestroyed &&
+                    player.x < enemy.x + enemy.width &&
+                    player.x + player.width > enemy.x &&
+                    player.y < enemy.y + enemy.height &&
+                    player.y + player.height > enemy.y
+                ) {
+                    player.isDestroyed = true;
+                    impactSound.play(); // Reproduz o som de impacto
+                    setTimeout(() => {
+                        alert("Ai ai ai");
+                        location.reload(); // Reinicia o jogo após o game over
+                    }, 500); // Espera um momento antes de exibir o alerta
+                }
+
+            });
+        }
+
+        function checkCollisions() {
+            bullets.forEach((bullet, bulletIndex) => {
+                enemies.forEach((enemy, enemyIndex) => {
+                    if (
+                        bullet.x < enemy.x + enemy.width &&
+                        bullet.x + bullet.width > enemy.x &&
+                        bullet.y < enemy.y + enemy.height &&
+                        bullet.y + bullet.height > enemy.y
+                    ) {
+                        bullets.splice(bulletIndex, 1);
+                        enemies.splice(enemyIndex, 1);
+
+                        // Reinicia o som toda vez que um obstáculo é destruído
+                        destroySound.currentTime = 0; // Volta para o início do som
+                        destroySound.play();
+                    }
+                });
+            });
+        }
+
+        function gameLoop() {
+            ctx.fillStyle = backgroundColor;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            drawPlayer();
+            drawBullets();
+            drawEnemies();
+
+            updateBullets();
+            updateEnemies();
+            checkCollisions();
+
+            requestAnimationFrame(gameLoop);
+        }
+
+        function spawnEnemy() {
+            enemies.push({
+                x: Math.random() * (canvas.width - 50),
+                y: -50,
+                width: 50,
+                height: 50,
+                isDestroyed: false
+            });
+        }
+
+        document.addEventListener("keydown", movePlayer);
+        setInterval(spawnEnemy, 1000);
+
+        gameLoop();
+    </script>
+</body>
+
+</html>

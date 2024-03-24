@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+
+<!--CRIADO EM VÍDEO PELO ZEE GAMEDEV E O CHATGPT KKKKKKKKKKKKKK-->
+
+<head>
+    <title>Menu de Jogo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            background-image: url('manoel_gome.jpg');
+            background-size: cover;
+        }
+
+        .button {
+            padding: 10px 20px;
+            font-size: 18px;
+            cursor: pointer;
+            margin: 10px;
+        }
+
+        #playButton {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+        }
+
+        #exitButton {
+            background-color: #f44336;
+            color: white;
+            border: none;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Caneta Azul VS Lula Analfabeto</h1>
+    <button class="button" id="playButton">Jogar</button>
+    <button class="button" id="exitButton">Sair</button>
+
+    <script>
+        const playButton = document.getElementById('playButton');
+        const exitButton = document.getElementById('exitButton');
+
+        playButton.addEventListener('click', () => {
+            alert('Iniciar o jogo!');
+            window.location.href = 'jogo.html';
+            // Coloque aqui a lógica para iniciar o jogo
+        });
+
+        exitButton.addEventListener('click', () => {
+            if (confirm('Tem certeza que deseja sair?')) {
+                window.close();
+            }
+        });
+    </script>
+</body>
+
+</html>
